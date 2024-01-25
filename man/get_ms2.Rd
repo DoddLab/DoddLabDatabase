@@ -23,6 +23,7 @@ get_ms2(lab_id = 'S00001', ce = '20', polarity = 'positive')
 get_ms2(lab_id = 'I00101', ce = '20', polarity = 'negative')
 get_ms2(lab_id = 'H00101', ce = '20', polarity = 'negative')
 get_ms2(lab_id = 'MP000015', polarity = 'positive')
+get_ms2(lab_id = 'PP000015', polarity = 'positive')
 }
 }
 \author{

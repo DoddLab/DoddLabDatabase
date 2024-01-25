@@ -13,6 +13,7 @@
 #' \dontrun{
 #' get_compound(lab_id = "S00001")
 #' get_compound(lab_id = "MP000015")
+#' get_compound(lab_id = "PP000015")
 #' }
 
 
@@ -43,6 +44,16 @@ setGeneric(name = "get_compound",
                  dplyr::rename(lab_id = id)
 
                rm(msdial_lib);gc()
+             }
+
+             if (stringr::str_detect(lab_id, 'PP\\d+|PN\\d+')) {
+               data('fiehn_peptide_lib', envir = environment())
+
+               cpd_table <- fiehn_peptide_lib$positive$lib_meta %>%
+                 dplyr::bind_rows(fiehn_peptide_lib$negative$lib_meta) %>%
+                 dplyr::rename(lab_id = id)
+
+               rm(fiehn_peptide_lib);gc()
              }
 
              # match labid
@@ -83,6 +94,7 @@ setGeneric(name = "get_compound",
 #' get_ms2(lab_id = 'I00101', ce = '20', polarity = 'negative')
 #' get_ms2(lab_id = 'H00101', ce = '20', polarity = 'negative')
 #' get_ms2(lab_id = 'MP000015', polarity = 'positive')
+#' get_ms2(lab_id = 'PP000015', polarity = 'positive')
 #' }
 
 # get_ms2(lab_id = 'S00001', ce = '10', polarity = 'positive')
@@ -93,6 +105,7 @@ setGeneric(name = "get_compound",
 # get_ms2(lab_id = 'H00101', ce = '20', polarity = 'negative')
 # get_ms2(lab_id = 'S00017', ce = '10', polarity = 'positive')
 # get_ms2(lab_id = 'MP000015', polarity = 'positive')
+# get_ms2(lab_id = 'PP000015', polarity = 'positive')
 
 setGeneric(name = 'get_ms2',
            def = function(lab_id,
@@ -307,6 +320,17 @@ setGeneric(name = 'get_ms2',
                data("msdial_lib", envir = environment())
                temp_spec <- msdial_lib[[polarity]][['lib_spec']][[lab_id]]
                rm(msdial_lib);gc()
+               if (is.null(temp_spec)) {
+                 message(crayon::red("No spectra of this compound & this ce is found!"))
+               } else {
+                 return(temp_spec)
+               }
+             }
+
+             if (stringr::str_detect(lab_id, 'PP\\d+|PN\\d+')) {
+               data("fiehn_peptide_lib", envir = environment())
+               temp_spec <- fiehn_peptide_lib[[polarity]][['lib_spec']][[lab_id]]
+               rm(fiehn_peptide_lib);gc()
                if (is.null(temp_spec)) {
                  message(crayon::red("No spectra of this compound & this ce is found!"))
                } else {

@@ -3,17 +3,11 @@
 
 #' @title load_spec_db
 #' @author Zhiwei Zhou
-#' @param lib database name, 'zhuMetLib', 'zhuMetLib_orbitrap', 'fiehnHilicLib'. Default: 'zhuMetLib'
-#' @param instrument "SciexTripleTOF", "AgilentQTOF", "BrukerQTOF", "ThermoOrbitrap", "ThermoExploris", "AgilentDTIMMS", "BrukerTIMS". Default: "SciexTripleTOF"
-#' @param column 'hilic', 'rp'. Default: 'hilic'
-#' @param method_lc 'Amide12min' or 'Amide23min'
-#' @param ce "10", "20", "30", "35,15", "40", "50"; Default: '30'
+#' @param lib database name, 'dodd', 'msdial', 'peptide'. Default: 'dodd'
+#' @param column 'hilic', 'c18'. Default: 'hilic'
+#' @param ce "10", "20", "40"; Default: '20'
 #' @param polarity 'positive' or 'negative'. Default: 'positive'
 #' @param adduct_list NULL
-# #' @param is_rt_score whether only reserve compounds with RT
-# #' @param is_ccs_score whether only reserve compounds with CCS
-#' @param is_rt_calibration TRUE
-#' @param path '.'
 #' @importFrom magrittr %>%
 #' @importFrom crayon blue red yellow green bgRed
 #' @importFrom stringr str_detect str_extract
@@ -24,15 +18,22 @@
 #' test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'positive', adduct_list = '[M+H]+')
 #' # msdial lib
 #' test <- load_spec_db(lib = 'msdial', polarity = 'positive')
+#' # peptide lib
+#' test <- load_spec_db(lib = 'peptide', polarity = 'positive')
 #' }
 #'
 
 # test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'positive', adduct_list = '[M+H]+')
 # test <- load_spec_db(lib = 'msdial', polarity = 'positive')
+# test <- load_spec_db(lib = 'peptide', polarity = 'positive')
+# test <- load_spec_db(lib = 'gnps_bile_acid', polarity = 'positive')
+# test <- load_spec_db(lib = 'gnps_acyl_amides', polarity = 'positive')
+# test <- load_spec_db(lib = 'gnps_acyl_esters', polarity = 'positive')
+# test <- load_spec_db(lib = 'all_public', polarity = 'positive')
 
 setGeneric(name = 'load_spec_db',
            def = function(
-    lib = c('dodd', 'msdial'),
+    lib = c('dodd', 'msdial', 'peptide', 'gnps_bile_acid', 'gnps_acyl_amides', 'gnps_acyl_esters', 'all_public'),
     column = c('hilic', 'c18'),
     ce = c('10', '20', '40'),
     polarity = c('positive', 'negative'),
@@ -58,7 +59,32 @@ setGeneric(name = 'load_spec_db',
                      paste0('Load the ', lib, ' library\n',
                             'Parameters:\n',
                             'Polarity: ', polarity, '\n')
-                   }
+                   },
+                   'msdial' = {
+                     paste0('Load the ', lib, ' library\n',
+                            'Parameters:\n',
+                            'Polarity: ', polarity, '\n')
+                   },
+                   'gnps_bile_acid' = {
+                     paste0('Load the ', lib, ' library\n',
+                            'Parameters:\n',
+                            'Polarity: ', polarity, '\n')
+                   },
+                   'gnps_acyl_amides' = {
+                     paste0('Load the ', lib, ' library\n',
+                            'Parameters:\n',
+                            'Polarity: ', polarity, '\n')
+                   },
+                   'gnps_acyl_esters' = {
+                     paste0('Load the ', lib, ' library\n',
+                            'Parameters:\n',
+                            'Polarity: ', polarity, '\n')
+                   },
+                   'all_public' = {
+                     paste0('Load the ', lib, ' library\n',
+                            'Parameters:\n',
+                            'Polarity: ', polarity, '\n')
+                   },
                  )
                )
              )
@@ -76,6 +102,103 @@ setGeneric(name = 'load_spec_db',
                        cpd_lib <- msdial_lib[[polarity]]$lib_meta
                        ms2_lib <- msdial_lib[[polarity]]$lib_spec
                        rm(msdial_lib);gc()
+                     },
+                     'peptide' = {
+                       data("fiehn_peptide_lib", envir = environment())
+                       cpd_lib <- fiehn_peptide_lib[[polarity]]$lib_meta
+                       ms2_lib <- fiehn_peptide_lib[[polarity]]$lib_spec
+                       rm(fiehn_peptide_lib);gc()
+                     },
+                     'gnps_bile_acid' = {
+                       data("gnps_bile_acid_lib", envir = environment())
+                       cpd_lib <- gnps_bile_acid_lib[[polarity]]$lib_meta
+                       ms2_lib <- gnps_bile_acid_lib[[polarity]]$lib_spec
+                       rm(gnps_bile_acid_lib);gc()
+                     },
+                     'gnps_acyl_amides' = {
+                       data("gnps_acyl_amides_lib", envir = environment())
+                       cpd_lib <- gnps_acyl_amides_lib[[polarity]]$lib_meta
+                       ms2_lib <- gnps_acyl_amides_lib[[polarity]]$lib_spec
+                       rm(gnps_acyl_amides_lib);gc()
+                     },
+                     'gnps_acyl_esters' = {
+                       data("gnps_acyl_esters_lib", envir = environment())
+                       cpd_lib <- gnps_acyl_esters_lib[[polarity]]$lib_meta
+                       ms2_lib <- gnps_acyl_esters_lib[[polarity]]$lib_spec
+                       rm(gnps_acyl_esters_lib);gc()
+                     },
+                     'all_public' = {
+                       data("msdial_lib", envir = environment())
+                       data("fiehn_peptide_lib", envir = environment())
+                       data("gnps_bile_acid_lib", envir = environment())
+                       data("gnps_acyl_amides_lib", envir = environment())
+                       data("gnps_acyl_esters_lib", envir = environment())
+
+                       external_id_msdial <- msdial_lib[[polarity]]$lib_meta$comment %>%
+                         stringr::str_extract('DB#=.+;') %>%
+                         stringr::str_replace('DB#=', '') %>%
+                         stringr::str_replace(';', '')
+
+                       external_id_bile_acid <- gnps_bile_acid_lib[[polarity]]$lib_meta$comment %>%
+                         stringr::str_extract('DB#=.+;') %>%
+                         stringr::str_replace('DB#=', '') %>%
+                         stringr::str_replace(';', '')
+
+                       external_id_acyl_amides <- gnps_acyl_amides_lib[[polarity]]$lib_meta$comment %>%
+                         stringr::str_extract('DB#=.+;') %>%
+                         stringr::str_replace('DB#=', '') %>%
+                         stringr::str_replace(';', '')
+
+                       external_id_acyl_esters <- gnps_acyl_esters_lib[[polarity]]$lib_meta$comment %>%
+                         stringr::str_extract('DB#=.+;') %>%
+                         stringr::str_replace('DB#=', '') %>%
+                         stringr::str_replace(';', '')
+
+                       idx_rep_bile_acid <- which(external_id_bile_acid %in% external_id_msdial)
+                       idx_rep_acyl_amides <- which(external_id_acyl_amides %in% external_id_msdial)
+                       idx_rep_acyl_esters <- which(external_id_acyl_esters %in% external_id_msdial)
+
+                       cpd_lib1 <- msdial_lib[[polarity]]$lib_meta %>% dplyr::select(id:inchikey)
+                       ms2_lib1 <- msdial_lib[[polarity]]$lib_spec
+                       cpd_lib2 <- fiehn_peptide_lib[[polarity]]$lib_meta  %>% dplyr::select(id:inchikey)
+                       ms2_lib2 <- fiehn_peptide_lib[[polarity]]$lib_spec
+
+                       cpd_lib3 <- gnps_bile_acid_lib[[polarity]]$lib_meta %>% dplyr::select(id:inchikey)
+                       ms2_lib3 <- gnps_bile_acid_lib[[polarity]]$lib_spec
+                       if (length(idx_rep_bile_acid) > 0) {
+                         cpd_lib3 <- cpd_lib3[-idx_rep_bile_acid,]
+                         ms2_lib3 <- ms2_lib3[-idx_rep_bile_acid]
+                       }
+                       cpd_lib4 <- gnps_acyl_amides_lib[[polarity]]$lib_meta %>% dplyr::select(id:inchikey)
+                       ms2_lib4 <- gnps_acyl_amides_lib[[polarity]]$lib_spec
+                       if (length(idx_rep_acyl_amides) > 0) {
+                         cpd_lib4 <- cpd_lib4[-idx_rep_acyl_amides,]
+                         ms2_lib4 <- ms2_lib4[-idx_rep_acyl_amides]
+                       }
+                       cpd_lib5 <- gnps_acyl_esters_lib[[polarity]]$lib_meta %>% dplyr::select(id:inchikey)
+                       ms2_lib5 <- gnps_acyl_esters_lib[[polarity]]$lib_spec
+                       if (length(idx_rep_acyl_esters) > 0) {
+                         cpd_lib5 <- cpd_lib4[-idx_rep_acyl_esters,]
+                         ms2_lib5 <- ms2_lib4[-idx_rep_acyl_esters]
+                       }
+
+                       cpd_lib <- cpd_lib1 %>%
+                         dplyr::bind_rows(cpd_lib2) %>%
+                         dplyr::bind_rows(cpd_lib3) %>%
+                         dplyr::bind_rows(cpd_lib4) %>%
+                         dplyr::bind_rows(cpd_lib5)
+
+                       ms2_lib <- c(ms2_lib1,
+                                    ms2_lib2,
+                                    ms2_lib3,
+                                    ms2_lib4,
+                                    ms2_lib5)
+
+                       rm(msdial_lib, fiehn_peptide_lib, gnps_bile_acid_lib, gnps_acyl_amides_lib, gnps_acyl_esters_lib);gc()
+                       rm(cpd_lib1, cpd_lib2, cpd_lib3, cpd_lib4, cpd_lib5);gc()
+                       rm(ms2_lib1, ms2_lib2, ms2_lib3, ms2_lib4, ms2_lib5);gc()
+                       rm(external_id_msdial, external_id_bile_acid, external_id_acyl_amides, external_id_acyl_esters);gc()
+                       rm(idx_rep_bile_acid, idx_rep_acyl_amides, idx_rep_acyl_esters);gc()
                      }
              )
 
@@ -188,13 +311,110 @@ setGeneric(name = 'load_spec_db',
 
              # msdial lib ------------------------------------------------------
              if (lib == 'msdial') {
+               if (length(adduct_list) > 0) {
+                 cpd_lib <- cpd_lib %>% dplyr::filter(adduct %in% adduct_list)
+                 if (nrow(cpd_lib) == 0) {
+                   stop('Please modify the adduct form because no record is available')
+                 }
+                 lib_spec <- match(cpd_lib$id, names(ms2_lib)) %>% ms2_lib[.]
+               }
+
                result <- list(lib_meta = cpd_lib,
                               lib_spec = ms2_lib)
 
                return(result)
              }
 
+             # fiehn peptide lib -----------------------------------------------
+             if (lib == 'peptide') {
+               if (length(adduct_list) > 0) {
+                 cpd_lib <- cpd_lib %>% dplyr::filter(adduct %in% adduct_list)
+                 if (nrow(cpd_lib) == 0) {
+                   stop('Please modify the adduct form because no record is available')
+                 }
+                 lib_spec <- match(cpd_lib$id, names(ms2_lib)) %>% ms2_lib[.]
+               }
 
+               result <- list(lib_meta = cpd_lib,
+                              lib_spec = ms2_lib)
+
+               return(result)
+             }
+
+             # gnps_bile_acid lib -----------------------------------------------
+             if (lib == 'gnps_bile_acid') {
+               if (length(adduct_list) > 0) {
+                 cpd_lib <- cpd_lib %>% dplyr::filter(adduct %in% adduct_list)
+                 if (nrow(cpd_lib) == 0) {
+                   stop('Please modify the adduct form because no record is available')
+                 }
+                 lib_spec <- match(cpd_lib$id, names(ms2_lib)) %>% ms2_lib[.]
+               }
+               result <- list(lib_meta = cpd_lib,
+                              lib_spec = ms2_lib)
+
+               return(result)
+             }
+
+             # gnps_acyl_amides lib -----------------------------------------------
+             if (lib == 'gnps_acyl_amides') {
+               if (length(adduct_list) > 0) {
+                 cpd_lib <- cpd_lib %>% dplyr::filter(adduct %in% adduct_list)
+                 if (nrow(cpd_lib) == 0) {
+                   stop('Please modify the adduct form because no record is available')
+                 }
+                 lib_spec <- match(cpd_lib$id, names(ms2_lib)) %>% ms2_lib[.]
+               }
+               result <- list(lib_meta = cpd_lib,
+                              lib_spec = ms2_lib)
+
+               return(result)
+             }
+
+             # gnps_acyl_amides lib -----------------------------------------------
+             if (lib == 'gnps_acyl_esters') {
+               if (length(adduct_list) > 0) {
+                 cpd_lib <- cpd_lib %>% dplyr::filter(adduct %in% adduct_list)
+                 if (nrow(cpd_lib) == 0) {
+                   stop('Please modify the adduct form because no record is available')
+                 }
+                 lib_spec <- match(cpd_lib$id, names(ms2_lib)) %>% ms2_lib[.]
+               }
+               result <- list(lib_meta = cpd_lib,
+                              lib_spec = ms2_lib)
+
+               return(result)
+             }
+
+             # gnps_acyl_amides lib -----------------------------------------------
+             if (lib == 'gnps_acyl_esters') {
+               if (length(adduct_list) > 0) {
+                 cpd_lib <- cpd_lib %>% dplyr::filter(adduct %in% adduct_list)
+                 if (nrow(cpd_lib) == 0) {
+                   stop('Please modify the adduct form because no record is available')
+                 }
+                 lib_spec <- match(cpd_lib$id, names(ms2_lib)) %>% ms2_lib[.]
+               }
+               result <- list(lib_meta = cpd_lib,
+                              lib_spec = ms2_lib)
+
+               return(result)
+             }
+
+             # gnps_acyl_amides lib -----------------------------------------------
+             if (lib == 'all_public') {
+               if (length(adduct_list) > 0) {
+                 cpd_lib <- cpd_lib %>% dplyr::filter(adduct %in% adduct_list)
+                 if (nrow(cpd_lib) == 0) {
+                   stop('Please modify the adduct form because no record is available')
+                 }
+                 lib_spec <- match(cpd_lib$id, names(ms2_lib)) %>% ms2_lib[.]
+               }
+               result <- list(lib_meta = cpd_lib,
+                              lib_spec = ms2_lib)
+
+               return(result)
+             }
 
            }
 )

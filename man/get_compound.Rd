@@ -16,6 +16,7 @@ search compound information via lab_id
 \dontrun{
 get_compound(lab_id = "S00001")
 get_compound(lab_id = "MP000015")
+get_compound(lab_id = "PP000015")
 }
 }
 \author{

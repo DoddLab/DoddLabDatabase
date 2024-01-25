@@ -5,7 +5,8 @@
 \title{load_spec_db}
 \usage{
 load_spec_db(
-  lib = c("dodd", "msdial"),
+  lib = c("dodd", "msdial", "peptide", "gnps_bile_acid", "gnps_acyl_amides",
+    "gnps_acyl_esters", "all_public"),
   column = c("hilic", "c18"),
   ce = c("10", "20", "40"),
   polarity = c("positive", "negative"),
@@ -13,23 +14,15 @@ load_spec_db(
 )
 }
 \arguments{
-\item{lib}{database name, 'zhuMetLib', 'zhuMetLib_orbitrap', 'fiehnHilicLib'. Default: 'zhuMetLib'}
+\item{lib}{database name, 'dodd', 'msdial', 'peptide'. Default: 'dodd'}
 
-\item{column}{'hilic', 'rp'. Default: 'hilic'}
+\item{column}{'hilic', 'c18'. Default: 'hilic'}
 
-\item{ce}{"10", "20", "30", "35,15", "40", "50"; Default: '30'}
+\item{ce}{"10", "20", "40"; Default: '20'}
 
 \item{polarity}{'positive' or 'negative'. Default: 'positive'}
 
 \item{adduct_list}{NULL}
-
-\item{instrument}{"SciexTripleTOF", "AgilentQTOF", "BrukerQTOF", "ThermoOrbitrap", "ThermoExploris", "AgilentDTIMMS", "BrukerTIMS". Default: "SciexTripleTOF"}
-
-\item{method_lc}{'Amide12min' or 'Amide23min'}
-
-\item{is_rt_calibration}{TRUE}
-
-\item{path}{'.'}
 }
 \description{
 load_spec_db
@@ -40,6 +33,8 @@ load_spec_db
 test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'positive', adduct_list = '[M+H]+')
 # msdial lib
 test <- load_spec_db(lib = 'msdial', polarity = 'positive')
+# peptide lib
+test <- load_spec_db(lib = 'peptide', polarity = 'positive')
 }
 
 }
