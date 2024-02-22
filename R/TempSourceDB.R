@@ -60,7 +60,8 @@
 # usethis::use_data(cpd_dodd_lib, overwrite = TRUE)
 
 
-###############################################################################
+################################################################################
+# gnps_lib ---------------------------------------------------------------------
 # load('~/Project/04_package/00_Database/GNPS_ReverseLib/00_converted_database/ms2_gnps_bile_acid_lib.RData')
 # gnps_bile_acid_lib <- ms2_gnps_bile_acid_lib
 # usethis::use_data(gnps_bile_acid_lib)
@@ -72,3 +73,8 @@
 # load('~/Project/04_package/00_Database/GNPS_ReverseLib/00_converted_database/ms2_gnps_acyl_esters_lib.RData')
 # gnps_acyl_esters_lib <- ms2_gnps_acyl_esters_lib
 # usethis::use_data(gnps_acyl_esters_lib)
+
+################################################################################
+# pathdb_enteropath ------------------------------------------------------------
+# load('~/Project/04_package/00_Database/Enteropathway/pathdb_enteropathway_v1_240222.RData')
+# usethis::use_data(pathdb_enteropathway)

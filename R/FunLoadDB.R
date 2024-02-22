@@ -585,3 +585,21 @@ setGeneric(name = 'calculateMz',
 
              mz
            })
+
+
+
+################################################################################
+# startup massage --------------------------------------------------------------
+.onAttach <- function(libname, pkgname){
+  packageStartupMessage("
+Version 0.2.2
+-------------
+Authors: Zhiwei Zhou
+Maintainer: Zhiwei Zhou
+
+Updates
+-------------
+o Add pathdb_enteropathway database
+o Add startup message
+")
+}

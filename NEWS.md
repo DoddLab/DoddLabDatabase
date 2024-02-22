@@ -25,3 +25,7 @@
 
 #### DoddLabDatabase 0.2.1
 * Add adduct filter for public database
+
+#### DoddLabDatabase 0.2.2
+* Add pathdb_enteropathway database
+* Add startup message
