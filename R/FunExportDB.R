@@ -464,3 +464,119 @@ setGeneric(name = 'generate_msp',
              close(file_result)
            }
 )
+
+
+
+
+#' @title export_ms2_db
+#' @author Zhiwei Zhou
+#' @param lib dodd lab library. "dodd"
+#' @param polarity ionization polarity. "positive", "negative"
+#' @param ms1_version MS1 version. "v2.6.1", "v2.5.0", "v2.4.0", "v2.0.0"
+#' @param ms2_version MS2 version. "v2.6.1", "v2.5.0", "v2.4.0", "v2.3.0"
+#' @param msp_name ouput msp file name. e.g. "dodd_lib_stanford_hilic_pos.msp"
+#' @param dir_path ouput directory path. Defaule: "."
+#' @importFrom magrittr %>%
+#' @importFrom crayon blue red yellow green bgRed
+#' @importFrom stringr str_detect str_extract
+#' @export
+#' @examples
+#' \dontrun{
+#' export_ms2_db(lib = 'dodd',
+#'               ms1_version = 'v2.6.1',
+#'               ms2_version = 'v2.6.1',
+#'               polarity = 'positive',
+#'               msp_name = "dodd_lib_pos_v2.6.1.msp",
+#'               dir_path = '~/Project/04_package/00_Database/DoddLib/06_exported_db/')
+#'
+#' export_ms2_db(lib = 'dodd',
+#'               ms1_version = 'v2.6.1',
+#'               ms2_version = 'v2.6.1',
+#'               polarity = 'negative',
+#'               msp_name = "dodd_lib_neg_v2.6.1.msp",
+#'               dir_path = '~/Project/04_package/00_Database/DoddLib/06_exported_db/')
+#' }
+
+
+# lib <- 'dodd'
+# ms1_version <- 'v2.6.1'
+# ms2_version <- 'v2.6.1'
+# polarity <- 'positive'
+# msp_name <- "dodd_lib_pos.msp"
+# dir_path <- '~/Project/04_package/00_Database/DoddLib/06_exported_db/'
+
+# export_ms2_db(lib = 'dodd',
+#               ms1_version = 'v2.6.1',
+#               ms2_version = 'v2.6.1',
+#               polarity = 'positive',
+#               msp_name = "dodd_lib_pos_v2.6.1.msp",
+#               dir_path = '~/Project/04_package/00_Database/DoddLib/06_exported_db/')
+#
+# export_ms2_db(lib = 'dodd',
+#               ms1_version = 'v2.6.1',
+#               ms2_version = 'v2.6.1',
+#               polarity = 'negative',
+#               msp_name = "dodd_lib_neg_v2.6.1.msp",
+#               dir_path = '~/Project/04_package/00_Database/DoddLib/06_exported_db/')
+
+setGeneric(name = 'export_ms2_db',
+           def = function(lib = c('dodd'),
+                          ms1_version = c('v2.6.1', 'v2.5.0', 'v2.4.0', 'v2.0.0'),
+                          ms2_version = c('v2.6.1', 'v2.5.0', 'v2.4.0', 'v2.3.0'),
+                          polarity = c('positive', 'negative'),
+                          msp_name = "dodd_lib_pos.msp",
+                          dir_path = '.'){
+
+             message(crayon::blue("Start export database for MSDIAL...\n"))
+
+             lib <- match.arg(lib)
+             polarity <- match.arg(polarity)
+             ms1_version <- match.arg(ms1_version)
+             ms2_version <- match.arg(ms2_version)
+
+             # load databases
+             data('list_cpd_dodd_lib', envir = environment())
+             cpd_obj <- list_cpd_dodd_lib[[ms1_version]]
+             rm(list_cpd_dodd_lib);gc()
+
+             data('list_ms2_dodd_lib', envir = environment())
+             ms2_obj <- list_ms2_dodd_lib[[ms2_version]][[polarity]]
+             rm(list_ms2_dodd_lib);gc()
+
+             adduct_type <- ifelse(polarity == "positive", "[M+H]+", "[M-H]-")
+
+             lab_id_ms2 <- names(ms2_obj)
+             walk(seq_along(lab_id_ms2), function(i){
+               temp_id <- lab_id_ms2[i]
+               idx <- which(cpd_obj$compound_table$lab_id == temp_id)
+               temp_info <- cpd_obj$compound_table %>% dplyr::slice(idx)
+
+               temp_ms2_list <- ms2_obj[[temp_id]]
+               temp_ce_list <- names(temp_ms2_list)
+               walk(seq_along(temp_ms2_list), function(i){
+                 temp_spec <- temp_ms2_list[[i]]
+                 temp_ce <- temp_ce_list[i]
+
+                 generate_msp(file_name = file.path(dir_path, msp_name),
+                              cmp_name = temp_info$compound_name,
+                              precusormz = ifelse(polarity == "positive", temp_info$mz_pos, temp_info$mz_neg),
+                              adduct = adduct_type,
+                              instrument_type = "Q-TOF",
+                              instrument = "Agilent-6545-XF",
+                              smiles = temp_info$smiles,
+                              inchikey = temp_info$inchikey,
+                              formula = temp_info$formula,
+                              polarity = polarity,
+                              ce = temp_ce,
+                              # rt = ifelse(is.na(temp_info$rt_c18_pos), "", temp_info$rt_c18_pos),
+                              doddlib_id = temp_info$lab_id,
+                              kegg_id = temp_info$kegg_id,
+                              hmdb_id = temp_info$hmdb_id,
+                              pubchem_id = temp_info$pubchem_id,
+                              spec = temp_spec)
+
+               })
+             })
+
+             message(crayon::green("Done!\n"))
+           })

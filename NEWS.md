@@ -29,3 +29,24 @@
 #### DoddLabDatabase 0.2.2
 * Add pathdb_enteropathway database
 * Add startup message
+
+#### DoddLabDatabase 0.2.3 (20240325)
+* Update ms2_dodd_lib to v2.4.0
+* Update cpd_dodd_lib to v2.4.0
+* Add list_cpd_dodd_lib, list_ms2_dodd_lib objects to retrieve old version DBs
+* Add parameter version in load_spec_db function
+* Add parameter use_preferred_adduct in load_spec_db function
+
+#### DoddLabDatabase 0.2.4 (20240329)
+* Update ms2_dodd_lib to v2.5.0
+* Update cpd_dodd_lib to v2.5.0
+
+#### DoddLabDatabase 0.2.5 (20240424)
+* Add the msdial_lipidblast_lib
+
+#### DoddLabDatabase 0.2.6 (20240625)
+* Update ms2_dodd_lib to v2.6.1
+* Update cpd_dodd_lib to v2.6.1
+
+#### DoddLabDatabase 0.2.7 (20240917)
+* Add a function export_ms2_db to export ms2 database to a MSP file

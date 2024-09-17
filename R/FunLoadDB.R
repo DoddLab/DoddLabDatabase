@@ -3,19 +3,23 @@
 
 #' @title load_spec_db
 #' @author Zhiwei Zhou
-#' @param lib database name, 'dodd', 'msdial', 'peptide'. Default: 'dodd'
+#' @param lib database name, 'dodd', 'msdial', 'peptide', 'gnps_bile_acid', 'gnps_acyl_amides', 'gnps_acyl_esters', 'msdial_lipid', 'all_public'. Default: 'dodd'
+#' @param version used ms2_dodd_lib version. This function is only suuported by dodd lab libraries. Currently, it contains 'v2.4.0', 'v2.3.0'. Default: 'v2.4.0'
 #' @param column 'hilic', 'c18'. Default: 'hilic'
 #' @param ce "10", "20", "40"; Default: '20'
 #' @param polarity 'positive' or 'negative'. Default: 'positive'
 #' @param adduct_list NULL
+#' @param use_preferred_adduct only used in dodd lib. If it is applied, the prefered adduct will be used. It will overlay the adduct_list parameter. Default: TRUE
 #' @importFrom magrittr %>%
 #' @importFrom crayon blue red yellow green bgRed
 #' @importFrom stringr str_detect str_extract
 #' @export
 #' @examples
 #' \dontrun{
-#' # dodd lib
-#' test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'positive', adduct_list = '[M+H]+')
+#' # dodd lib & use defined adduct
+#' test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'positive', adduct_list = '[M+H]+', use_preferred_adduct = FALSE)
+#' # dodd lib & use preferred adduct
+#' test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'negative', adduct_list = '[M-H]-', use_preferred_adduct = TRUE)
 #' # msdial lib
 #' test <- load_spec_db(lib = 'msdial', polarity = 'positive')
 #' # peptide lib
@@ -30,26 +34,33 @@
 # test <- load_spec_db(lib = 'gnps_acyl_amides', polarity = 'positive')
 # test <- load_spec_db(lib = 'gnps_acyl_esters', polarity = 'positive')
 # test <- load_spec_db(lib = 'all_public', polarity = 'positive')
+# test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'negative', adduct_list = '[M-H]-', use_preferred_adduct = TRUE)
+# test <- load_spec_db(lib = 'msdial_lipid', polarity = 'positive', class_adduct_list = 'PC_[M+H]+')
 
 setGeneric(name = 'load_spec_db',
            def = function(
-    lib = c('dodd', 'msdial', 'peptide', 'gnps_bile_acid', 'gnps_acyl_amides', 'gnps_acyl_esters', 'all_public'),
+    lib = c('dodd', 'msdial', 'peptide', 'gnps_bile_acid', 'gnps_acyl_amides', 'gnps_acyl_esters', 'msdial_lipid', 'all_public'),
+    version = c('v2.6.1', 'v2.4.0', 'v2.3.0'),
     column = c('hilic', 'c18'),
     ce = c('10', '20', '40'),
     polarity = c('positive', 'negative'),
-    adduct_list = NULL
+    class_adduct_list = NULL, # only used in class_adduct
+    adduct_list = NULL,
+    use_preferred_adduct = TRUE
     # file_rt_ref = 'RT_recalibration_table.csv',
     # is_rt_calibration = FALSE,
     # path = NULL
            ){
              lib <- match.arg(lib)
              polarity <- match.arg(polarity)
+             version <- match.arg(version)
 
              message(
                crayon::blue(
                  switch (lib,
                    'dodd' = {
                      paste0('Load the ', lib, ' library\n',
+                            'Version: ', version, '\n',
                             'Parameters:\n',
                             'Collision energy: ', ce, '\n',
                             'Column: ', column, '\n',
@@ -80,6 +91,11 @@ setGeneric(name = 'load_spec_db',
                             'Parameters:\n',
                             'Polarity: ', polarity, '\n')
                    },
+                   'msdial_lipid' = {
+                     paste0('Load the ', lib, ' library\n',
+                            'Parameters:\n',
+                            'Polarity: ', polarity, '\n')
+                   },
                    'all_public' = {
                      paste0('Load the ', lib, ' library\n',
                             'Parameters:\n',
@@ -91,10 +107,10 @@ setGeneric(name = 'load_spec_db',
 
              switch (lib,
                      'dodd' = {
-                       data('cpd_dodd_lib', envir = environment())
-                       data('ms2_dodd_lib', envir = environment())
-                       cpd_lib <- cpd_dodd_lib
-                       ms2_lib <- ms2_dodd_lib
+                       data('list_cpd_dodd_lib', envir = environment())
+                       data('list_ms2_dodd_lib', envir = environment())
+                       cpd_lib <- list_cpd_dodd_lib[[version]]
+                       ms2_lib <- list_ms2_dodd_lib[[version]]
                        rm(cpd_dodd_lib, ms2_dodd_lib);gc()
                      },
                      'msdial' = {
@@ -126,6 +142,12 @@ setGeneric(name = 'load_spec_db',
                        cpd_lib <- gnps_acyl_esters_lib[[polarity]]$lib_meta
                        ms2_lib <- gnps_acyl_esters_lib[[polarity]]$lib_spec
                        rm(gnps_acyl_esters_lib);gc()
+                     },
+                     'msdial_lipid' = {
+                       data("msdial_lipidblast_lib", envir = environment())
+                       cpd_lib <- msdial_lipidblast_lib[[polarity]]$lib_meta
+                       ms2_lib <- msdial_lipidblast_lib[[polarity]]$lib_spec
+                       rm(msdial_lipidblast_lib);gc()
                      },
                      'all_public' = {
                        data("msdial_lib", envir = environment())
@@ -206,6 +228,22 @@ setGeneric(name = 'load_spec_db',
              if (lib == 'dodd') {
                column <- match.arg(column)
                ce <- match.arg(ce)
+
+               # modify lib_meta
+               lib_meta <- cpd_lib$compound_table
+
+
+               if (use_preferred_adduct) {
+                 switch (polarity,
+                   'positive' = {
+                     adduct_list <- unique(lib_meta$preferred_adduct_pos)
+                   },
+                   'negative' = {
+                     adduct_list <- unique(lib_meta$preferred_adduct_neg)
+                   }
+                 )
+               }
+
                # check adduct type
                if (length(adduct_list) == 0) {
                  stop('Please input adduct_list\n')
@@ -220,9 +258,6 @@ setGeneric(name = 'load_spec_db',
                }
 
 
-
-               # modify lib_meta
-               lib_meta <- cpd_lib$compound_table
                switch(polarity,
                       'positive' = {
                         temp_adduct_table <- lib_adduct_nl$positive %>% dplyr::filter(adduct %in% adduct_list)
@@ -254,6 +289,17 @@ setGeneric(name = 'load_spec_db',
                                      values_to = 'mz') %>%
                  dplyr::rename(id = lab_id, name = compound_name) %>%
                  dplyr::select(id:formula, adduct:mz, dplyr::everything())
+
+               if (use_preferred_adduct) {
+                 switch (polarity,
+                   'positive' = {
+                     lib_meta <- lib_meta %>% dplyr::filter(adduct == preferred_adduct_pos)
+                   },
+                   'negative' = {
+                     lib_meta <- lib_meta %>% dplyr::filter(adduct == preferred_adduct_neg)
+                   }
+                 )
+               }
 
                # select mode responding RT
                if (column == 'hilic') {
@@ -307,7 +353,11 @@ setGeneric(name = 'load_spec_db',
                               lib_spec = lib_spec)
 
                return(result)
+
              }
+
+
+
 
              # msdial lib ------------------------------------------------------
              if (lib == 'msdial') {
@@ -375,6 +425,23 @@ setGeneric(name = 'load_spec_db',
              if (lib == 'gnps_acyl_esters') {
                if (length(adduct_list) > 0) {
                  cpd_lib <- cpd_lib %>% dplyr::filter(adduct %in% adduct_list)
+                 if (nrow(cpd_lib) == 0) {
+                   stop('Please modify the adduct form because no record is available')
+                 }
+                 lib_spec <- match(cpd_lib$id, names(ms2_lib)) %>% ms2_lib[.]
+               }
+               result <- list(lib_meta = cpd_lib,
+                              lib_spec = ms2_lib)
+
+               return(result)
+             }
+
+             # msdial_lipid ----------------------------------------------------
+             if (lib == 'msdial_lipid') {
+               if (length(class_adduct_list) > 0) {
+                 cpd_lib <- cpd_lib %>%
+                   dplyr::mutate(class_adduct = paste0(compound_class, '_', adduct)) %>%
+                   dplyr::filter(class_adduct %in% class_adduct_list)
                  if (nrow(cpd_lib) == 0) {
                    stop('Please modify the adduct form because no record is available')
                  }
@@ -592,14 +659,36 @@ setGeneric(name = 'calculateMz',
 # startup massage --------------------------------------------------------------
 .onAttach <- function(libname, pkgname){
   packageStartupMessage("
-Version 0.2.2
+Version 0.2.6 (20240625)
 -------------
 Authors: Zhiwei Zhou
 Maintainer: Zhiwei Zhou
 
 Updates
 -------------
-o Add pathdb_enteropathway database
-o Add startup message
+o Update ms2_dodd_lib to v2.4.0
+o Update cpd_dodd_lib to v2.4.0
+o Add list_cpd_dodd_lib, list_ms2_dodd_lib objects to retrieve old version DBs
+o Add parameter version in load_spec_db function
+o Add parameter use_preferred_adduct in load_spec_db function
+
+Version 0.2.4 (20240329)
+-------------
+o Update ms2_dodd_lib to v2.5.0
+o Update cpd_dodd_lib to v2.5.0
+
+Version 0.2.5 (20240425)
+-------------
+o Add the msdial_lipidblast_lib
+
+Version 0.2.6 (20240625)
+-------------
+o Update ms2_dodd_lib to v2.6.1
+o Update cpd_dodd_lib to v2.6.1
+
+Version 0.2.7 (20240917)
+-------------
+o Add a function export_ms2_db to export ms2 database to a MSP file
+
 ")
 }

@@ -6,15 +6,20 @@
 \usage{
 load_spec_db(
   lib = c("dodd", "msdial", "peptide", "gnps_bile_acid", "gnps_acyl_amides",
-    "gnps_acyl_esters", "all_public"),
+    "gnps_acyl_esters", "msdial_lipid", "all_public"),
+  version = c("v2.6.1", "v2.4.0", "v2.3.0"),
   column = c("hilic", "c18"),
   ce = c("10", "20", "40"),
   polarity = c("positive", "negative"),
-  adduct_list = NULL
+  class_adduct_list = NULL,
+  adduct_list = NULL,
+  use_preferred_adduct = TRUE
 )
 }
 \arguments{
-\item{lib}{database name, 'dodd', 'msdial', 'peptide'. Default: 'dodd'}
+\item{lib}{database name, 'dodd', 'msdial', 'peptide', 'gnps_bile_acid', 'gnps_acyl_amides', 'gnps_acyl_esters', 'msdial_lipid', 'all_public'. Default: 'dodd'}
+
+\item{version}{used ms2_dodd_lib version. This function is only suuported by dodd lab libraries. Currently, it contains 'v2.4.0', 'v2.3.0'. Default: 'v2.4.0'}
 
 \item{column}{'hilic', 'c18'. Default: 'hilic'}
 
@@ -23,14 +28,18 @@ load_spec_db(
 \item{polarity}{'positive' or 'negative'. Default: 'positive'}
 
 \item{adduct_list}{NULL}
+
+\item{use_preferred_adduct}{only used in dodd lib. If it is applied, the prefered adduct will be used. It will overlay the adduct_list parameter. Default: TRUE}
 }
 \description{
 load_spec_db
 }
 \examples{
 \dontrun{
-# dodd lib
-test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'positive', adduct_list = '[M+H]+')
+# dodd lib & use defined adduct
+test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'positive', adduct_list = '[M+H]+', use_preferred_adduct = FALSE)
+# dodd lib & use preferred adduct
+test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'negative', adduct_list = '[M-H]-', use_preferred_adduct = TRUE)
 # msdial lib
 test <- load_spec_db(lib = 'msdial', polarity = 'positive')
 # peptide lib
