@@ -4,7 +4,7 @@
 #' @title load_spec_db
 #' @author Zhiwei Zhou
 #' @param lib database name, 'dodd', 'msdial', 'peptide', 'gnps_bile_acid', 'gnps_acyl_amides', 'gnps_acyl_esters', 'msdial_lipid', 'all_public'. Default: 'dodd'
-#' @param version used ms2_dodd_lib version. This function is only suuported by dodd lab libraries. Currently, it contains 'v2.4.0', 'v2.3.0'. Default: 'v2.4.0'
+#' @param version used ms2_dodd_lib version. This function is only suuported by dodd lab libraries. Currently, it contains 'v2.7.1', 'v2.6.1', 'v2.4.0', 'v2.3.0'. Default: 'v2.7.1'
 #' @param column 'hilic', 'c18'. Default: 'hilic'
 #' @param ce "10", "20", "40"; Default: '20'
 #' @param polarity 'positive' or 'negative'. Default: 'positive'
@@ -36,11 +36,12 @@
 # test <- load_spec_db(lib = 'all_public', polarity = 'positive')
 # test <- load_spec_db(lib = 'dodd', column = 'hilic', ce = '20', polarity = 'negative', adduct_list = '[M-H]-', use_preferred_adduct = TRUE)
 # test <- load_spec_db(lib = 'msdial_lipid', polarity = 'positive', class_adduct_list = 'PC_[M+H]+')
+# test <- load_spec_db(lib = 'dodd', version = 'v2.7.1', ce = '20', column = 'c18')
 
 setGeneric(name = 'load_spec_db',
            def = function(
     lib = c('dodd', 'msdial', 'peptide', 'gnps_bile_acid', 'gnps_acyl_amides', 'gnps_acyl_esters', 'msdial_lipid', 'all_public'),
-    version = c('v2.6.1', 'v2.4.0', 'v2.3.0'),
+    version = c('v2.7.1', 'v2.6.1', 'v2.4.0', 'v2.3.0'),
     column = c('hilic', 'c18'),
     ce = c('10', '20', '40'),
     polarity = c('positive', 'negative'),
@@ -690,5 +691,18 @@ Version 0.2.7 (20240917)
 -------------
 o Add a function export_ms2_db to export ms2 database to a MSP file
 
+Version 0.2.8 (20240920)
+-------------
+o Update ms2_dodd_lib to v2.7.1
+o Update cpd_dodd_lib to v2.7.1
+
+Version 0.2.9 (20241015)
+-------------
+o Add a function extract_ms2_from_target_list
+o Add a function state_library
+
+Version 0.2.10 (20241121)
+-------------
+o Add a list_class_adduct object to define class and adduct for MS-DIAL lipids
 ")
 }

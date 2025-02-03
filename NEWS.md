@@ -50,3 +50,14 @@
 
 #### DoddLabDatabase 0.2.7 (20240917)
 * Add a function export_ms2_db to export ms2 database to a MSP file
+
+#### DoddLabDatabase 0.2.8 (20240920)
+* Update ms2_dodd_lib to v2.7.1
+* Update cpd_dodd_lib to v2.7.1
+
+#### DoddLabDatabase 0.2.9 (20241015)
+* Add a function extract_ms2_from_target_list
+* Add a function state_library
+
+#### DoddLabDatabase 0.2.10 (20241121)
+* Add a list_class_adduct object to define class and adduct for MS-DIAL lipids

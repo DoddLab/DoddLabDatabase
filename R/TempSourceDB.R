@@ -168,3 +168,23 @@
 #      file = '~/Project/04_package/00_Database/DoddLib/01_compound_RT_lib/12_version_240531/list_cpd_dodd_lib_v2.6.1_240625.RData')
 
 ################################################################################
+# # DoddLib ----------------------------------------------------------------------
+# load('~/Project/04_package/00_Database/DoddLib/02_ms2_lib/v240920_v.2.7.0/ms2_dodd_lib_v2.7.0_240920.RData')
+# ms2_dodd_lib_v2.7.0 <- ms2_dodd_lib
+# load('./data/list_ms2_dodd_lib.rda')
+# list_ms2_dodd_lib$v2.7.0 <- ms2_dodd_lib_v2.7.0
+# names(list_ms2_dodd_lib)[5] <- 'v2.7.1'
+# usethis::use_data(list_ms2_dodd_lib, overwrite = TRUE)
+#
+#
+# load('~/Project/04_package/00_Database/DoddLib/01_compound_RT_lib/14_version_240828/cpd_dodd_lib_v2.7.1_240920.RData')
+# load('~/Project/04_package/00_Database/DoddLib/01_compound_RT_lib/12_version_240531/list_cpd_dodd_lib_v2.6.1_240625.RData')
+# list_cpd_dodd_lib$v2.7.1 <- cpd_dodd_lib
+# usethis::use_data(list_cpd_dodd_lib, overwrite = TRUE)
+# save(list_cpd_dodd_lib,
+#      file = '~/Project/04_package/00_Database/DoddLib/01_compound_RT_lib/12_version_240531/list_cpd_dodd_lib_v2.7.1_240920.RData')
+
+################################################################################
+# list_class_adduct ------------------------------------------------------------
+# load('~/Project/00_IBD_project/Data/20241120_CD_complicates/list_class_adduct_241121.RData')
+# usethis::use_data(list_class_adduct, overwrite = TRUE)

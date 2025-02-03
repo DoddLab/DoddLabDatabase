@@ -341,3 +341,112 @@ setGeneric(name = 'get_ms2',
            })
 
 
+
+  # state_library --------------------------------------------------------------
+
+#' @title state_library
+#' @author Zhiwei Zhou
+#' @description show the statistics of all libraries
+#' @importFrom magrittr %>%
+#' @importFrom dplyr select filter distinct bind_rows
+#' @importFrom tidyr pivot_longer
+#' @importFrom crayon yellow
+#' @export
+#' @examples
+#' \dontrun{
+#' state_library()
+#' }
+
+state_library <- function(){
+  data('list_cpd_dodd_lib', envir = environment())
+  cpd_dodd_lib <- list_cpd_dodd_lib[[length(list_cpd_dodd_lib)]]
+  version_cpd_dodd_lib <- cpd_dodd_lib$lib_info$version
+  date_cpd_dodd_lib <- cpd_dodd_lib$lib_info$date
+  n_cpd_dodd_lib <- cpd_dodd_lib$compound_table %>% nrow()
+  n_rt_cpd_dodd_lib <- cpd_dodd_lib$compound_table %>%
+    dplyr::select(lab_id, rt_c18_pos:rt_hilic_neg) %>%
+    tidyr::pivot_longer(cols = -lab_id, names_to = "mode", values_to = "rt") %>%
+    dplyr::filter(!is.na(rt)) %>% nrow()
+
+  data("list_ms2_dodd_lib", envir = environment())
+  ms2_dodd_lib <- list_ms2_dodd_lib[[length(list_ms2_dodd_lib)]]
+  n_ms2_dodd_lib_pos <- sapply(ms2_dodd_lib$positive, length) %>% sum()
+  n_ms2_dodd_lib_neg <- sapply(ms2_dodd_lib$negative, length) %>% sum()
+  n_ms2_dodd_lib <- n_ms2_dodd_lib_pos + n_ms2_dodd_lib_neg
+
+
+  data("msdial_lib", envir = environment())
+  version_msdial_lib <- msdial_lib$lib_info$version
+  date_msdial_lib <- msdial_lib$lib_info$date
+  n_cpd_msdial_lib <- msdial_lib$positive$lib_meta %>%
+    dplyr::bind_rows(msdial_lib$negative$lib_meta) %>%
+    dplyr::distinct(inchikey, .keep_all = TRUE) %>%
+    nrow()
+  n_ms2_msdial_lib_pos <- length(msdial_lib$positive$lib_spec)
+  n_ms2_msdial_lib_neg <- length(msdial_lib$negative$lib_spec)
+  n_ms2_msdial_lib <- n_ms2_msdial_lib_pos + n_ms2_msdial_lib_neg
+  n_rt_msdial_lib <- 0
+
+  data("fiehn_peptide_lib", envir = environment())
+  version_fiehn_peptide_lib <- fiehn_peptide_lib$lib_info$version
+  date_fiehn_peptide_lib <- fiehn_peptide_lib$lib_info$date
+  n_cpd_fiehn_peptide_lib <- fiehn_peptide_lib$positive$lib_meta %>%
+    dplyr::bind_rows(fiehn_peptide_lib$negative$lib_meta) %>%
+    distinct(inchikey, .keep_all = TRUE) %>% nrow()
+  n_ms2_fiehn_peptide_lib_pos <- length(fiehn_peptide_lib$positive$lib_spec)
+  n_ms2_fiehn_peptide_lib_neg <- length(fiehn_peptide_lib$negative$lib_spec)
+  n_ms2_fiehn_peptide_lib <- n_ms2_fiehn_peptide_lib_pos + n_ms2_fiehn_peptide_lib_neg
+  n_rt_fiehn_peptide_lib <- 0
+
+  data("gnps_bile_acid_lib", envir = environment())
+  version_gnps_bile_acid_lib <- gnps_bile_acid_lib$lib_info$version
+  date_gnps_bile_acid_lib <- gnps_bile_acid_lib$lib_info$date
+  n_cpd_gnps_bile_acid_lib <- gnps_bile_acid_lib$positive$lib_meta %>%
+    dplyr::bind_rows(gnps_bile_acid_lib$negative$lib_meta) %>%
+    dplyr::distinct(inchikey, .keep_all = TRUE) %>% nrow()
+  n_ms2_gnps_bile_acid_lib_pos <- length(gnps_bile_acid_lib$positive$lib_spec)
+  n_ms2_gnps_bile_acid_lib_neg <- length(gnps_bile_acid_lib$negative$lib_spec)
+  n_ms2_gnps_bile_acid_lib <- n_ms2_gnps_bile_acid_lib_pos + n_ms2_gnps_bile_acid_lib_neg
+  n_rt_gnps_bile_acid_lib <- 0
+
+  data("gnps_acyl_amides_lib", envir = environment())
+  version_gnps_acyl_amides_lib <- gnps_acyl_amides_lib$lib_info$version
+  date_gnps_acyl_amides_lib <- gnps_acyl_amides_lib$lib_info$date
+  n_cpd_gnps_acyl_amides_lib <- gnps_acyl_amides_lib$positive$lib_meta %>%
+    dplyr::bind_rows(gnps_acyl_amides_lib$negative$lib_meta) %>%
+    dplyr::distinct(inchikey, .keep_all = TRUE) %>% nrow()
+  n_ms2_gnps_acyl_amides_lib_pos <- length(gnps_acyl_amides_lib$positive$lib_spec)
+  n_ms2_gnps_acyl_amides_lib_neg <- length(gnps_acyl_amides_lib$negative$lib_spec)
+  n_ms2_gnps_acyl_amides_lib <- n_ms2_gnps_acyl_amides_lib_pos + n_ms2_gnps_acyl_amides_lib_neg
+  n_rt_gnps_acyl_amides_lib <- 0
+
+  data("gnps_acyl_esters_lib", envir = environment())
+  version_gnps_acyl_esters_lib <- gnps_acyl_esters_lib$lib_info$version
+  date_gnps_acyl_esters_lib <- gnps_acyl_esters_lib$lib_info$date
+  n_cpd_gnps_acyl_esters_lib <- gnps_acyl_esters_lib$positive$lib_meta %>%
+    dplyr::bind_rows(gnps_acyl_esters_lib$negative$lib_meta) %>%
+    dplyr::distinct(inchikey, .keep_all = TRUE) %>% nrow()
+  n_ms2_gnps_acyl_esters_lib_pos <- length(gnps_acyl_esters_lib$positive$lib_spec)
+  n_ms2_gnps_acyl_esters_lib_neg <- length(gnps_acyl_esters_lib$negative$lib_spec)
+  n_ms2_gnps_acyl_esters_lib <- n_ms2_gnps_acyl_esters_lib_pos + n_ms2_gnps_acyl_esters_lib_neg
+  n_rt_gnps_acyl_esters_lib <- 0
+
+
+  state_result <- data.frame(version = c(version_cpd_dodd_lib, version_msdial_lib, version_fiehn_peptide_lib,
+                                         version_gnps_bile_acid_lib, version_gnps_acyl_amides_lib, version_gnps_acyl_esters_lib),
+                             date = c(date_cpd_dodd_lib, date_msdial_lib, date_fiehn_peptide_lib,
+                                      date_gnps_bile_acid_lib, date_gnps_acyl_amides_lib, date_gnps_acyl_esters_lib),
+                             n_cpd = c(n_cpd_dodd_lib, n_cpd_msdial_lib, n_cpd_fiehn_peptide_lib,
+                                       n_cpd_gnps_bile_acid_lib, n_cpd_gnps_acyl_amides_lib, n_cpd_gnps_acyl_esters_lib),
+                             n_ms2 = c(n_ms2_dodd_lib, n_ms2_msdial_lib, n_ms2_fiehn_peptide_lib,
+                                       n_ms2_gnps_bile_acid_lib, n_ms2_gnps_acyl_amides_lib, n_ms2_gnps_acyl_esters_lib),
+                             n_rt = c(n_rt_cpd_dodd_lib, n_rt_msdial_lib, n_rt_fiehn_peptide_lib,
+                                      n_rt_gnps_bile_acid_lib, n_rt_gnps_acyl_amides_lib, n_rt_gnps_acyl_esters_lib),
+                             row.names = c("DoddLib", "MSDial", "FiehnPeptide", "GNPS_BileAcid", "GNPS_AcylAmides", "GNPS_AcylEsters"),
+                             stringsAsFactors = FALSE)
+
+  knitr::kable(state_result)
+
+}
+
+  # search_library -------------------------------------------------------------

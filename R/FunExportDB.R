@@ -521,8 +521,8 @@ setGeneric(name = 'generate_msp',
 
 setGeneric(name = 'export_ms2_db',
            def = function(lib = c('dodd'),
-                          ms1_version = c('v2.6.1', 'v2.5.0', 'v2.4.0', 'v2.0.0'),
-                          ms2_version = c('v2.6.1', 'v2.5.0', 'v2.4.0', 'v2.3.0'),
+                          ms1_version = c('v2.7.1', 'v2.6.1', 'v2.5.0', 'v2.4.0', 'v2.0.0'),
+                          ms2_version = c('v2.7.1', 'v2.6.1', 'v2.5.0', 'v2.4.0', 'v2.3.0'),
                           polarity = c('positive', 'negative'),
                           msp_name = "dodd_lib_pos.msp",
                           dir_path = '.'){

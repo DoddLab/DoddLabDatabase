@@ -7,7 +7,7 @@
 load_spec_db(
   lib = c("dodd", "msdial", "peptide", "gnps_bile_acid", "gnps_acyl_amides",
     "gnps_acyl_esters", "msdial_lipid", "all_public"),
-  version = c("v2.6.1", "v2.4.0", "v2.3.0"),
+  version = c("v2.7.1", "v2.6.1", "v2.4.0", "v2.3.0"),
   column = c("hilic", "c18"),
   ce = c("10", "20", "40"),
   polarity = c("positive", "negative"),
@@ -19,7 +19,7 @@ load_spec_db(
 \arguments{
 \item{lib}{database name, 'dodd', 'msdial', 'peptide', 'gnps_bile_acid', 'gnps_acyl_amides', 'gnps_acyl_esters', 'msdial_lipid', 'all_public'. Default: 'dodd'}
 
-\item{version}{used ms2_dodd_lib version. This function is only suuported by dodd lab libraries. Currently, it contains 'v2.4.0', 'v2.3.0'. Default: 'v2.4.0'}
+\item{version}{used ms2_dodd_lib version. This function is only suuported by dodd lab libraries. Currently, it contains 'v2.7.1', 'v2.6.1', 'v2.4.0', 'v2.3.0'. Default: 'v2.7.1'}
 
 \item{column}{'hilic', 'c18'. Default: 'hilic'}
 
